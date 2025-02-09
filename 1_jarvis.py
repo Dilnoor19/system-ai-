@@ -151,9 +151,6 @@ def open_apps(query):
             return True
     return False
 
-
-
-
 API_KEY = "YOUR_GEMINI_API_KEY"
 API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
 
@@ -177,7 +174,6 @@ def query_gemini(prompt):
         return data['contents'][0]['parts'][0]['text'] # assuming this is how the response is structured
     else:
         return 
-
 
 # main commands recever and decison maker
 def personal_assistant(): 
