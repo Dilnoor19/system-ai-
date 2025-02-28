@@ -178,7 +178,7 @@ def query_gemini(prompt):
 # main commands recever and decison maker
 def personal_assistant(): 
     wishme()
-    speak("jarvis rebooting.........!!")
+    speak("Friday rebooting.........!!")
     while True: 
         command = listen_to_command()
         if command:
