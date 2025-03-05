@@ -16,7 +16,6 @@ engine.setProperty('rate',rate-50)
 volume = engine.getProperty('volume')
 engine.setProperty('volume', volume+0.25)
  
-
 # speak function
 def speak(text):
     engine.say(text)
@@ -81,7 +80,6 @@ def show_time():
     current_time = datetime.datetime.now().strftime("%H:%M:%S")
     print(f"Current time: {current_time}")
     speak(f"Current time: {current_time}")
-
 
 # schdule function
 def schedule():
@@ -204,8 +202,7 @@ def personal_assistant():
                 speak("volume decreased")
             elif("volume mute" in command) or ("mute the sound" in command):
                 pyautogui.press("volumemute")
-                speak("volume muted")
-            
+                speak("volume muted")            
             elif "exit" in command or "stop" in command:
                 print("Goodbye!")
                 speak("Goodbye!")
