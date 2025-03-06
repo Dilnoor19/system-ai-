@@ -36,7 +36,6 @@ def listen_to_command():
         r.dynamic_energy_adjustment=2
         r.energy_threshold=3000
         r.phrase_time_limit=10
-        # print(sr.Microphone.list_microphone_names())
         audio = r.listen(source)
     try:
         print("\r", end="",flush=True)
@@ -63,17 +62,6 @@ def cal_day():
     }
     return day_dict.get(day,"unknown")
 
-def wishme():
-    hour = int(datetime.datetime.now().hour)
-    t = time.strftime("%I:%M:%p")
-    day = cal_day()
-
-    if (hour>=0) and (hour<=12) and ('AM' in t ):
-        speak(f"good morning boss ,it's {day} and the time is {t} ")
-    elif (hour>=12) and (hour<=16) and ('PM' in t ):
-        speak(f"good AFternoon boss ,it's {day} and the time is {t} ")
-    else:
-        speak(f"good evening boss ,it's {day} and the time is {t} ")
 
 # time teller
 def show_time():
@@ -119,6 +107,20 @@ def open_website(query):
             return True 
     return False
 
+# wishing system 
+def wishme():
+    hour = int(datetime.datetime.now().hour)
+    t = time.strftime("%I:%M:%p")
+    day = cal_day()
+    work = schedule()
+
+    if (hour>=0) and (hour<=12) and ('AM' in t ):
+        speak(f"good morning boss ,it's {day} and the time is {t} , task you have to {work} ")
+    elif (hour>=12) and (hour<=16) and ('PM' in t ):
+        speak(f"good AFternoon boss ,it's {day} and the time is {t}, task you have to do {work} ")
+    else:
+        speak(f"good evening boss ,it's {day} and the time is {t}, have a good night boss ")
+     
 # application opener
 def open_apps(query):
     apps = { 
