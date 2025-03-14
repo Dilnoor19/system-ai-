@@ -11,6 +11,7 @@ import json
 # Chat bot
 API_KEY = "YOUR_GEMINI_API_KEY"
 URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+
 def chat_with_gemini(prompt):
     headers = {"Content-Type": "application/json"}
     data = {"contents": [{"parts": [{"text": prompt}]}]}
