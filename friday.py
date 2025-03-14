@@ -6,6 +6,22 @@ import pyttsx3
 import speech_recognition as sr
 import webbrowser
 import os 
+import json
+
+# Chat bot
+API_KEY = "YOUR_GEMINI_API_KEY"
+URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
+def chat_with_gemini(prompt):
+    headers = {"Content-Type": "application/json"}
+    data = {"contents": [{"parts": [{"text": prompt}]}]}
+    response = requests.post(URL, headers=headers, json=data)
+    if response.status_code == 200:
+        result = response.json()
+        try:
+            return result["candidates"][0]["content"]["parts"][0]["text"]
+        except KeyError:
+            return "Error: Unexpected response format."
+    return f"Error {response.status_code}: {response.text}"
 
 # initialization
 engine = pyttsx3.init("sapi5")
@@ -20,6 +36,12 @@ engine.setProperty('volume', volume+0.25)
 def speak(text):
     engine.say(text)
     engine.runAndWait()
+
+# fun system
+def fun():
+    jokes = pyjokes.get_joke()
+    speak(jokes)
+    
 
 # listing function
 def listen_to_command():
@@ -151,30 +173,6 @@ def open_apps(query):
             return True
     return False
 
-API_KEY = "YOUR_GEMINI_API_KEY"
-API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent"
-
-def query_gemini(prompt):
-    headers = {
-        "Content-Type": "application/json"
-    }
-    payload = {
-        "contents": [
-            {
-                "parts": [{"text": prompt}]
-            }
-        ]
-    }
-    params = {"key": API_KEY}
-
-    response = requests.post(API_URL, headers=headers, json=payload, params=params)
-
-    if response.status_code == 200:
-        data = response.json()
-        return data['contents'][0]['parts'][0]['text'] # assuming this is how the response is structured
-    else:
-        return 
-
 # main commands recever and decison maker
 def personal_assistant(): 
     wishme()
@@ -187,15 +185,12 @@ def personal_assistant():
                 if not open_website(command):
                     if not open_apps(command):
                         speak("Website or application not found.")
+            elif"something funny" in command:
+                fun()
             elif "time" in command:
                 show_time() 
             elif "schedule" in command:
                 schedule()
-            elif "gemini" in command:
-                prompt = command.replace("gemini", "").strip()
-                response = query_gemini(prompt)
-                speak(response) 
-                print(response)
             elif("volume up" in command) or ("increase volume" in command):
                 pyautogui.press("volumeup")
                 speak("volume increased")
@@ -204,11 +199,13 @@ def personal_assistant():
                 speak("volume decreased")
             elif("volume mute" in command) or ("mute the sound" in command):
                 pyautogui.press("volumemute")
-                speak("volume muted")            
+                speak("volume muted")
             elif "exit" in command or "stop" in command:
                 print("Goodbye!")
                 speak("Goodbye!")
                 break
-
+            else:
+                response = chat_with_gemini(command)
+                speak(response)
 
 personal_assistant()
