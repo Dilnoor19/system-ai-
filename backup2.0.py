@@ -5,6 +5,25 @@ import pyttsx3
 import speech_recognition as sr
 import webbrowser
 import os 
+import requests
+import json
+import pyjokes
+
+API_KEY = "your api key" 
+URL = "Your url"
+
+def chat_with_gemini(prompt):
+    headers = {"Content-Type": "application/json"}
+    data = {"contents": [{"parts": [{"text": prompt}]}]}
+    response = requests.post(URL, headers=headers, json=data)
+    if response.status_code == 200:
+        result = response.json()
+        try:
+            return result["candidates"][0]["content"]["parts"][0]["text"]
+        except KeyError:
+            return "Error: Unexpected response format."
+    return f"Error {response.status_code}: {response.text}"
+
 
 # initialization
 engine = pyttsx3.init("sapi5")
@@ -20,6 +39,15 @@ engine.setProperty('volume', volume+0.25)
 def speak(text):
     engine.say(text)
     engine.runAndWait()
+
+# fun system
+def fun():
+    jokes = pyjokes.get_joke()
+    speak(jokes)
+    
+
+
+
 
 # listing function
 def listen_to_command():
@@ -56,7 +84,7 @@ def cal_day():
         1:"Monday", 
         2:"Tuesday",    
         3:"Wednesday",
-        4:"Thirsday",
+        4:"Thursday",
         5:"Friday",
         6:"Saturday",
         7:"Sunday"  
@@ -123,7 +151,7 @@ def open_website(query):
 # application opener
 def open_apps(query):
     apps = { 
-       "brave": "C:/Users/dilno/OneDrive/Desktop/Brave.lnk",
+        "brave": "C:/Users/dilno/OneDrive/Desktop/Brave.lnk",
         "spotify": "C:/Users/dilno/OneDrive/Desktop/Spotify.lnk" ,
         "calculator": "C:/Users/dilno/OneDrive/Desktop/Calculator.lnk",
         "whatsapp": "C:/Users/dilno/OneDrive/Desktop/WhatsApp.lnk",
@@ -148,32 +176,12 @@ def open_apps(query):
                 print(f"Failed to open {name}: {e}") 
                 speak(f"Sorry, I couldn't open {name}.") 
             return True
-    return False
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return False    
 
 # main commands recever and decison maker
 def personal_assistant(): 
     wishme()
-    speak("jarvis rebooting.........!!")
+    speak("Friday rebooting.........!!")
     while True: 
         command = listen_to_command()
         if command:
@@ -182,6 +190,8 @@ def personal_assistant():
                 if not open_website(command):
                     if not open_apps(command):
                         speak("Website or application not found.")
+            elif"something funny" in command:
+                fun()
             elif "time" in command:
                 show_time() 
             elif "schedule" in command:
@@ -195,11 +205,12 @@ def personal_assistant():
             elif("volume mute" in command) or ("mute the sound" in command):
                 pyautogui.press("volumemute")
                 speak("volume muted")
-            
             elif "exit" in command or "stop" in command:
                 print("Goodbye!")
                 speak("Goodbye!")
                 break
-
+            else:
+                response = chat_with_gemini(command)
+                speak(response)
 
 personal_assistant()
