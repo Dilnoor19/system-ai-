@@ -8,11 +8,12 @@ import os
 import requests
 import json
 import pyjokes
-import tkinter as tk
-from tkinter import ttk
+import wikipedia
+import pywhatkit as kit
 
-API_KEY = "AIzaSyAvnw_XPRrCXPG2hUrhn9DgU6a9G_K4KuQ"
-URL = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={API_KEY}"
+# chat bot for system ai
+API_KEY = "put your own api"
+URL = "put your url
 
 def chat_with_gemini(prompt):
     headers = {"Content-Type": "application/json"}
@@ -76,6 +77,12 @@ def listen_to_command():
         return "none"
     return query
 
+# Take Screenshot
+def take_screenshot():
+    screenshot = pyautogui.screenshot()
+    screenshot.save("screenshot.png")
+    speak("Screenshot taken.")
+
 # jarvis day system
 def cal_day():
     day = datetime.datetime.today().weekday() + 1
@@ -96,11 +103,11 @@ def wishme():
     day = cal_day()
 
     if (hour>=0) and (hour<=12) and ('AM' in t ):
-        speak(f"good morning boss ,it's {day} and the time is {t} ")
+        speak(f"good morning sir ,it's {day} and the time is {t} ")
     elif (hour>=12) and (hour<=16) and ('PM' in t ):
-        speak(f"good AFternoon boss ,it's {day} and the time is {t} ")
+        speak(f"good AFternoon sir ,it's {day} and the time is {t} ")
     else:
-        speak(f"good evening boss ,it's {day} and the time is {t} ")
+        speak(f"good evening sir ,it's {day} and the time is {t} ")
 
 # time teller
 def show_time():
@@ -108,18 +115,25 @@ def show_time():
     print(f"Current time: {current_time}")
     speak(f"Current time: {current_time}")
 
+# wikipedia
+def search_wikipedia(query):
+    try:
+        result = wikipedia.summary(query, sentences=2)
+        speak(result)
+    except Exception as e:
+        speak("Sorry, I couldn't find anything on Wikipedia.")
 
 # schdule function
 def schedule():
     day = cal_day().lower()
     week = {
-        "monday": "hey boss , today you have to attend college from 2pm to 6pm , after 7 pm you to do little workout , then 10pm to 12am you have to study college subject or do homework and at last work on previous project or practice new projects or you can also listen lecture"   ,      
-        "tuesday":  "hey boss , today you have to attend college from 2pm to 6pm , after 7 pm you to do little workout , then 10pm to 12am you have to study college subject or do homework and at last work on previous project or practice new projects or you can also listen lecture"   ,      
-        "wednesday": "hey boss , today you have to attend college from 2pm to 6pm , after 7 pm you to do little workout , then 10pm to 12am you have to study college subject or do homework and at last work on previous project or practice new projects or you can also listen lecture"  ,
-        "thirsday": "hey boss , today you have to attend college from 2pm to 6pm , after 7 pm you to do little workout , then 10pm to 12am you have to study college subject or do homework and at last work on previous project or practice new projects or you can also listen lecture" ,
-        "friday": "hey boss , today you have to attend college from 2pm to 6pm , after 7 pm you to do little workout , then 10pm to 12am you have to study college subject or do homework and at last work on previous project or practice new projects or you can also listen lecture" ,
-        "saturday": "hey boss today is our college holiday so you have to study atleast 3hrs between 12pm tpo 6pm ,you have to do workout at 7pm  and then after dinner yu have to take language lectures or you can also do coding depend on you, remember not to waste time on laptop and mobile " ,
-        "sunday":  " boss today is sunday so today you don't have to workout but don't forget to take proper meal and try to study for atleast few time and remeber to revise your week"      
+        "monday": "Hey boss, today you have work from 9am to 5pm. After 6pm, do a little workout. Then, from 8pm to 10pm, work on personal projects or learn something new.",
+        "tuesday": "Hey boss, today you have work from 9am to 5pm. After 6pm, do a little workout. Then, from 8pm to 10pm, focus on improving a skill or working on a side project.",
+        "wednesday": "Hey boss, today you have work from 9am to 5pm. After 6pm, do a little workout. Then, from 8pm to 10pm, read a book, work on a project, or study something useful.",
+        "thursday": "Hey boss, today you have work from 9am to 5pm. After 6pm, do a little workout. Then, from 8pm to 10pm, review your progress on your projects and plan for the next steps.",
+        "friday": "Hey boss, today you have work from 9am to 5pm. After 6pm, relax a little. Then, from 8pm to 10pm, either socialize, watch something educational, or practice a hobby.",
+        "saturday": "Hey boss, today is a free day! Spend at least 3 hours learning something new or working on a passion project. Do a workout at 7pm. After dinner, unwind, watch something informative, or read.",
+        "sunday": "Boss, today is a rest day. No workout, but make sure to eat well and reflect on the past week. Spend some time planning and preparing for the upcoming week."
     }
     if day in week.keys():
         speak(week[day])
@@ -188,8 +202,8 @@ def open_apps(query):
 
 # weather telling
 def get_weather(city="Delhi"):
-    API_KEY = "be6139128a0cf9984131954b53a4a1d6"
-    URL = f"https://api.openweathermap.org/data/2.5/weather?q=New%20York&appid=be6139128a0cf9984131954b53a4a1d6&units=metric"
+    API_KEY = "put your own api"
+    URL = "put your url"
 
     try:
         response = requests.get(URL)
@@ -207,19 +221,37 @@ def get_weather(city="Delhi"):
         weather_report = (f"The weather in {city} is {weather_desc}. "
                           f"The temperature is {temp} degrees Celsius with {humidity}% humidity. "
                           f"Wind speed is {wind_speed} meters per second.")
-
-        print(weather_report)
         speak(weather_report)
     except Exception as e:
         speak("I couldn't retrieve the weather details.")
         print("Error:", e)
+    
+
+# Play Songs
+def play_song():
+    speak("What song would you like to play?")
+    song_name = listen_to_command()
+    if song_name != "none":
+        kit.playonyt(song_name)
+        speak(f"Playing {song_name} on YouTube.")
+    else:
+        speak("I couldn't understand the song name.")
+
+# News Updates
+def get_news():
+    API_KEY = "put your own api"
+    url = "put your url"
+    response = requests.get(url)
+    news_data = response.json()
+    articles = news_data.get("articles", [])
+    for article in articles[:5]:
+        speak(article["title"])
 
 # main commands recever and decison maker
-def personal_assistant(): 
-    # wishme()
-    # speak("Friday rebooting.........!!")
+def command_prompt(): 
+    speak("Friday rebooting.........!!")
     while True: 
-        command = input("-->  ")
+        command = listen_to_command()
         if command:
             command = command.lower() 
             if "open " in command:
@@ -241,8 +273,14 @@ def personal_assistant():
             elif("volume mute" in command) or ("mute the sound" in command):
                 pyautogui.press("volumemute")
                 speak("volume muted")
-            elif("weather") in command:
+            elif"weather" in command:
                 get_weather()
+            elif"play song" in command:
+                play_song()
+            elif "take ss" in command:
+                take_screenshot()
+            elif "news" in command:
+                get_news()
             elif "exit" in command or "stop" in command:
                 print("Goodbye!")
                 speak("Goodbye!")
@@ -251,4 +289,4 @@ def personal_assistant():
                 response = chat_with_gemini(command)
                 speak(response)
 
-personal_assistant()
+command_prompt()
