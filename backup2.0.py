@@ -4,13 +4,16 @@ import pyautogui
 import pyttsx3
 import speech_recognition as sr
 import webbrowser
-import os 
+import os
 import requests
 import json
 import pyjokes
+import wikipedia
+import pywhatkit as kit
 
-API_KEY = "your api key" 
-URL = "Your url"
+# chat bot for system ai
+API_KEY = "put your own api"
+URL = "put your url
 
 def chat_with_gemini(prompt):
     headers = {"Content-Type": "application/json"}
@@ -37,6 +40,7 @@ engine.setProperty('volume', volume+0.25)
 
 # speak function
 def speak(text):
+    print(f"🤖 Friday: {text}")
     engine.say(text)
     engine.runAndWait()
 
@@ -44,38 +48,25 @@ def speak(text):
 def fun():
     jokes = pyjokes.get_joke()
     speak(jokes)
-    
 
-
-
-
-# listing function
-def listen_to_command():
+# voice comand taker
+def listen():
     r = sr.Recognizer()
     with sr.Microphone() as source:
-        r.adjust_for_ambient_noise(source,duration=0.5)
-        print("listening.........", end="",flush=True)
-        r.pause_threshold=1.0
-        r.phrase_threshold=0.3
-        r.sample_rate = 48000
-        r.dynamic_energy_threshold=True
-        r.operation_timeout=5
-        r.non_speaking_duration=0.5
-        r.dynamic_energy_adjustment=2
-        r.energy_threshold=3000
-        r.phrase_time_limit=10
-        # print(sr.Microphone.list_microphone_names())
-        audio = r.listen(source)
+        r.adjust_for_ambient_noise(source, duration=0.5)
+        print("🎙️ Listening...")
+        audio = r.listen(source, timeout=5, phrase_time_limit=10)
     try:
-        print("\r", end="",flush=True)
-        print("recognizing.......", end="",flush=True)
-        query = r.recognize_google(audio, language='en-in')
-        print("\r", end="",flush=True)
-        print(f"user said: {query}\n")
-    except Exception as e:
-        print("say that again please")
-        return "none"
-    return query
+        return r.recognize_google(audio, language='en-in').lower()
+    except sr.UnknownValueError:
+        speak("Sorry, I didn't catch that.")
+        return ""
+
+# Take Screenshot
+def take_screenshot():
+    screenshot = pyautogui.screenshot()
+    screenshot.save("screenshot.png")
+    speak("Screenshot taken.")
 
 # jarvis day system
 def cal_day():
@@ -97,11 +88,11 @@ def wishme():
     day = cal_day()
 
     if (hour>=0) and (hour<=12) and ('AM' in t ):
-        speak(f"good morning boss ,it's {day} and the time is {t} ")
+        speak(f"good morning sir ,it's {day} and the time is {t} ")
     elif (hour>=12) and (hour<=16) and ('PM' in t ):
-        speak(f"good AFternoon boss ,it's {day} and the time is {t} ")
+        speak(f"good AFternoon sir ,it's {day} and the time is {t} ")
     else:
-        speak(f"good evening boss ,it's {day} and the time is {t} ")
+        speak(f"good evening sir ,it's {day} and the time is {t} ")
 
 # time teller
 def show_time():
@@ -109,18 +100,25 @@ def show_time():
     print(f"Current time: {current_time}")
     speak(f"Current time: {current_time}")
 
+# wikipedia
+def search_wikipedia(query):
+    try:
+        result = wikipedia.summary(query, sentences=2)
+        speak(result)
+    except Exception as e:
+        speak("Sorry, I couldn't find anything on Wikipedia.")
 
 # schdule function
 def schedule():
     day = cal_day().lower()
     week = {
-        "monday": "hey boss , today you have to attend college from 2pm to 6pm , after 7 pm you to do little workout , then 10pm to 12am you have to study college subject or do homework and at last work on previous project or practice new projects or you can also listen lecture"   ,      
-        "tuesday":  "hey boss , today you have to attend college from 2pm to 6pm , after 7 pm you to do little workout , then 10pm to 12am you have to study college subject or do homework and at last work on previous project or practice new projects or you can also listen lecture"   ,      
-        "wednesday": "hey boss , today you have to attend college from 2pm to 6pm , after 7 pm you to do little workout , then 10pm to 12am you have to study college subject or do homework and at last work on previous project or practice new projects or you can also listen lecture"  ,
-        "thirsday": "hey boss , today you have to attend college from 2pm to 6pm , after 7 pm you to do little workout , then 10pm to 12am you have to study college subject or do homework and at last work on previous project or practice new projects or you can also listen lecture" ,
-        "friday": "hey boss , today you have to attend college from 2pm to 6pm , after 7 pm you to do little workout , then 10pm to 12am you have to study college subject or do homework and at last work on previous project or practice new projects or you can also listen lecture" ,
-        "saturday": "hey boss today is our college holiday so you have to study atleast 3hrs between 12pm tpo 6pm ,you have to do workout at 7pm  and then after dinner yu have to take language lectures or you can also do coding depend on you, remember not to waste time on laptop and mobile " ,
-        "sunday":  " boss today is sunday so today you don't have to workout but don't forget to take proper meal and try to study for atleast few time and remeber to revise your week"      
+        "monday": "Hey boss, today you have work from 9am to 5pm. After 6pm, do a little workout. Then, from 8pm to 10pm, work on personal projects or learn something new.",
+        "tuesday": "Hey boss, today you have work from 9am to 5pm. After 6pm, do a little workout. Then, from 8pm to 10pm, focus on improving a skill or working on a side project.",
+        "wednesday": "Hey boss, today you have work from 9am to 5pm. After 6pm, do a little workout. Then, from 8pm to 10pm, read a book, work on a project, or study something useful.",
+        "thursday": "Hey boss, today you have work from 9am to 5pm. After 6pm, do a little workout. Then, from 8pm to 10pm, review your progress on your projects and plan for the next steps.",
+        "friday": "Hey boss, today you have work from 9am to 5pm. After 6pm, relax a little. Then, from 8pm to 10pm, either socialize, watch something educational, or practice a hobby.",
+        "saturday": "Hey boss, today is a free day! Spend at least 3 hours learning something new or working on a passion project. Do a workout at 7pm. After dinner, unwind, watch something informative, or read.",
+        "sunday": "Boss, today is a rest day. No workout, but make sure to eat well and reflect on the past week. Spend some time planning and preparing for the upcoming week."
     }
     if day in week.keys():
         speak(week[day])
@@ -130,10 +128,16 @@ def open_website(query):
     websites = {
         "anime": "https://hianime.to/",
         "discord": "https://discord.com/",
-        "instagram": "https://www.instagram.com/",
-        "gpt" : "https://chatgpt.com/?model=auto" ,
         "type test" : " https://www.typingtest.com/",
-        "github" : "https://github.com/"
+        "jiocinema": "https://www.jiocinema.com/",
+        "snapchat": "https://web.snapchat.com/" ,
+        "w3": "https://www.w3schools.com/",
+        "fiver": "https://www.fiverr.com/",
+        "aifinder": "https://theresanaiforthat.com/",
+        "Mxplayer" : "https://www.mxplayer.in/",
+        "netflix": "https://www.netflix.com/in/",
+        "c compiler": "https://www.programiz.com/c-programming/online-compiler/",
+        "paper trading": "https://in.tradingview.com/chart/Ovn2F72s/?symbol=BITSTAMP%3ABTCUSD",
     }
     query = query.lower()  
     for name, url in websites.items():
@@ -151,19 +155,22 @@ def open_website(query):
 # application opener
 def open_apps(query):
     apps = { 
+        "insta":"C:/Users/dilno/OneDrive/Desktop/Instagram.lnk",
         "brave": "C:/Users/dilno/OneDrive/Desktop/Brave.lnk",
         "spotify": "C:/Users/dilno/OneDrive/Desktop/Spotify.lnk" ,
-        "calculator": "C:/Users/dilno/OneDrive/Desktop/Calculator.lnk",
         "whatsapp": "C:/Users/dilno/OneDrive/Desktop/WhatsApp.lnk",
         "youtube": "C:/Users/dilno/OneDrive/Desktop/YouTube.lnk" ,
         "vs code" : "C:/Users/dilno/OneDrive/Desktop/Visual Studio Code.lnk" ,
-        "store" : "C:/Users/dilno/OneDrive/Desktop/Microsoft Store.lnk" ,
-        "classroom" : "C:/Users/dilno/OneDrive/Desktop/Google Classroom.lnk", 
+        "store" : "C:/Users/dilno/OneDrive/Desktop/Microsoft Store.lnk" , 
         "chrome" : "C:/Users/Public/Desktop/Google Chrome.lnk" ,
         "microsoft edge" : "C:/Users/Public/Desktop/Microsoft Edge.lnk" ,
         "copilet" : "C:/Users/dilno/OneDrive/Desktop/Copilot.lnk",
         "c drive" : "c:" ,
-        "camera" : "C:/Users/dilno/OneDrive/Desktop/Camera.lnk"
+        "gpt": "C:/Users/dilno/OneDrive/Desktop/ChatGPT.lnk",
+        "github": "C:/Users/dilno/OneDrive/Desktop/GitHub.lnk",
+        "camera" : "C:/Users/dilno/OneDrive/Desktop/Camera.lnk",
+        "linkedin":"C:/Users/dilno/OneDrive/Desktop/LinkedIn.lnk",
+
     } 
     query = query.lower()
     for name, url in apps.items():
@@ -178,9 +185,55 @@ def open_apps(query):
             return True
     return False    
 
+# weather telling
+def get_weather(city="Delhi"):
+    API_KEY = "put your own api"
+    URL = "put your url"
+
+    try:
+        response = requests.get(URL)
+        data = response.json()
+
+        if data["cod"] != 200:
+            speak("Sorry, I couldn't fetch the weather.")
+            return
+        
+        weather_desc = data["weather"][0]["description"]
+        temp = data["main"]["temp"]
+        humidity = data["main"]["humidity"]
+        wind_speed = data["wind"]["speed"]
+
+        weather_report = (f"The weather in {city} is {weather_desc}. "
+                          f"The temperature is {temp} degrees Celsius with {humidity}% humidity. "
+                          f"Wind speed is {wind_speed} meters per second.")
+        speak(weather_report)
+    except Exception as e:
+        speak("I couldn't retrieve the weather details.")
+        print("Error:", e)
+    
+
+# Play Songs
+def play_song():
+    speak("What song would you like to play?")
+    song_name = listen_to_command()
+    if song_name != "none":
+        kit.playonyt(song_name)
+        speak(f"Playing {song_name} on YouTube.")
+    else:
+        speak("I couldn't understand the song name.")
+
+# News Updates
+def get_news():
+    API_KEY = "put your own api"
+    url = "put your url"
+    response = requests.get(url)
+    news_data = response.json()
+    articles = news_data.get("articles", [])
+    for article in articles[:5]:
+        speak(article["title"])
+
 # main commands recever and decison maker
-def personal_assistant(): 
-    wishme()
+def command_prompt(): 
     speak("Friday rebooting.........!!")
     while True: 
         command = listen_to_command()
@@ -205,6 +258,14 @@ def personal_assistant():
             elif("volume mute" in command) or ("mute the sound" in command):
                 pyautogui.press("volumemute")
                 speak("volume muted")
+            elif"weather" in command:
+                get_weather()
+            elif"play song" in command:
+                play_song()
+            elif "take ss" in command:
+                take_screenshot()
+            elif "news" in command:
+                get_news()
             elif "exit" in command or "stop" in command:
                 print("Goodbye!")
                 speak("Goodbye!")
@@ -213,4 +274,4 @@ def personal_assistant():
                 response = chat_with_gemini(command)
                 speak(response)
 
-personal_assistant()
+command_prompt()
