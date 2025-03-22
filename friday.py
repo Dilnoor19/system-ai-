@@ -49,33 +49,18 @@ def fun():
     jokes = pyjokes.get_joke()
     speak(jokes)
 
-# listing function
-def listen_to_command():
+# voice comand taker
+def listen():
     r = sr.Recognizer()
     with sr.Microphone() as source:
-        r.adjust_for_ambient_noise(source,duration=0.5)
-        print("🎙️ Listening...", end="",flush=True)
-        r.pause_threshold=1.0
-        r.phrase_threshold=0.3
-        r.sample_rate = 48000
-        r.dynamic_energy_threshold=True
-        r.operation_timeout=5
-        r.non_speaking_duration=0.5
-        r.dynamic_energy_adjustment=2
-        r.energy_threshold=3000
-        r.phrase_time_limit=10
-        # print(sr.Microphone.list_microphone_names())
-        audio = r.listen(source)
+        r.adjust_for_ambient_noise(source, duration=0.5)
+        print("🎙️ Listening...")
+        audio = r.listen(source, timeout=5, phrase_time_limit=10)
     try:
-        print("\r", end="",flush=True)
-        print("🧠 Recognizing...", end="",flush=True)
-        query = r.recognize_google(audio, language='en-in')
-        print("\r", end="",flush=True)
-        print(f"🗣️ You said: {query}")
-    except Exception as e:
-        print("🤖 Friday: Sorry, I didn't catch that.")
-        return "none"
-    return query
+        return r.recognize_google(audio, language='en-in').lower()
+    except sr.UnknownValueError:
+        speak("Sorry, I didn't catch that.")
+        return ""
 
 # Take Screenshot
 def take_screenshot():
